@@ -12,9 +12,8 @@ config = GeneralConfig()
 
 NUM_VARS = 4
 
-LOCK_FREE = 0
-LOCK_PYTHON_DONE = 1
-LOCK_XS_DONE = 2
+LOCK_PYTHON_DONE = 0
+LOCK_XS_DONE = 1
 
 
 
@@ -33,15 +32,36 @@ def read_xs_file():
         raise FileNotFoundError(f"File {config.xsdat_path} not found. \n Remember that the XS script must be running in the game for this to work. The Python script is not in charge of creating the xsdat data file.")
 
     with open(config.xsdat_path, "rb") as f:
-        data = f.read(4 * (NUM_VARS + 1))
-        return struct.unpack(f"<{NUM_VARS + 1}i", data)
+
+        # Read full file content
+        file_content = f.read()
+
+        print(file_content)
+
+        # Format: 4 bytes for the lock value, followed by NUM_VARS * 4 bytes for the values
+        # Read those and unpack them
+        
+        # Unpack the first 4 bytes as an integer (lock value)
+        lock_val = int.from_bytes(file_content[0:4], byteorder="little")
+
+        values = [-1 for _ in range(NUM_VARS)]
+        for i in range(NUM_VARS):
+            values[i] = int.from_bytes(file_content[4 + i * 4: 4 + (i + 1) * 4], byteorder="little")
+
+
+        return lock_val, values
 
 
 def write_xs_file(lock_val, values):
+    print(f"Writing to file path: {config.xsdat_path}")
+    print(f"Writing to file: {lock_val}, {values}")
+
     with open(config.xsdat_path, "wb") as f:
         f.write(struct.pack("i", lock_val))
         for v in values:
             f.write(struct.pack("i", v))
+        f.flush()
+        os.fsync(f.fileno())  # Ensures physical disk write
 
 
 def file_sync_loop():
@@ -51,7 +71,8 @@ def file_sync_loop():
 
     while True:
         try:
-            current_lock, *values = read_xs_file()
+            current_lock, values = read_xs_file()
+            print(f"Current lock: {current_lock}, values: {values}")
 
             with lock:
                     shared_values = values
@@ -77,14 +98,15 @@ def update_values(*args):
     with lock:
         shared_values[:] = new_vals
 
+
     # Write ONLY if the XS script has signaled it is done
     if current_lock == LOCK_XS_DONE:
         # We write to the lock that the Python script is done, and we write the new values
         write_xs_file(LOCK_PYTHON_DONE, shared_values)
+        return(f"XS script done, wrote to file: {new_vals}")
     else:
-        print(f"XS script not done, not writing to file yet, please wait a bit. Current lock: {current_lock}")
+        return(f"XS script not done, not writing to file yet, please wait a bit. Current lock: {current_lock}")
 
-    return f"✅ Sent to XS: {new_vals}"
 
 
 def build_interface():

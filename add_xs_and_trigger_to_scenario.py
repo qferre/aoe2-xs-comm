@@ -24,7 +24,7 @@ def add_xs_and_triggers_to_scenario(
     trigger_manager = scenario.trigger_manager
     xs_trigger = trigger_manager.add_trigger("XS Main Loop",
                                              looping =True,)
-    xs_trigger.new_condition.timer(timer=1)
+    xs_trigger.new_condition.timer(timer=5) # TODO put this back to 1
 
 
     with open(xs_script_path, 'r', encoding='utf-8') as f:
