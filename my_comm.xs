@@ -6,23 +6,21 @@ void main() {
     int LOCK_XS_DONE = 1;
 
 
-
-    //xsEnableRule(chatAllVariables);
-
     // Open the xsdat file corresponding to the scenario, or create it if it doesn't exist
     // NOTES:
     // - The file will have the same name as the scenario
     // - The XS script is in change of creating the file, not the Python script
     bool file_status = false;
     bool closing_status = false;
-    file_status = xsCreateFile(true); // "true" means we open in append mode, so the file will not be erased at each loop and we can read the values written by Python
+    file_status = xsOpenFile();
 
 
 
     if (file_status == false) {
         xsChatData("ERROR: cannot open the file.");
-        return;
+        return; // TODO : DO NOT RETURN HERE, just continue the loop without reading the file. this will allow us to ensure the file is always created (by the code much below)
     }
+
 
     // Read first variable, which is the lock
     xsSetFilePosition(0);
@@ -30,7 +28,7 @@ void main() {
     lock = xsReadInt();
     xsChatData("Lock = "+lock);
 
-    // BUG : Python can read what I'm writing just fine, but xscript does not understand the lock ? It thinks it's -1 ?
+
 
     // Read only if the lock is free (meaning the Python thread has signaled it is done)
     if (lock == LOCK_PYTHON_DONE) {
@@ -61,8 +59,8 @@ void main() {
 
 
     // Close and reopen the file to write back the values
-    //closing_status = xsCloseFile();
-    //file_status = xsCreateFile(false); // "false" means we open in write mode, so the file will be erased at each loop and we can write the values back
+    closing_status = xsCloseFile();
+    file_status = xsCreateFile(false); // "false" means we open in write mode, so the file will be erased at each loop and we can write the values back
 
     // Write the current trigger values back to the file
     if (true) { // TODO : add an additional lock before writing, so that the triggers in game gets an opportunity to modify the values before they are written again ?
