@@ -66,8 +66,7 @@ if __name__ == "__main__":
 
     add_xs_and_triggers_to_scenario(
         scenario_path=f"{PATH_ROOT}/Testing.aoe2scenario",
-        #xs_script_path=f"{this_file_dir}/my_comm.xs",
-        xs_script_path=f"{this_file_dir}/testing_file_write.xs",
+        xs_script_path=f"{this_file_dir}/my_comm.xs",
         output_path=f"{PATH_ROOT}/Testing_MODIFIED.aoe2scenario",
     )
     # Example usage
