@@ -39,27 +39,26 @@ TODO add two screenshots : of the gradio app, and of the xs chat log showing the
 
 ## Development
 
-In add_xs_and_trigger_to_scenario.py, there is space for trigger logic. Also in the XS script. Also in the xs_comm_gui.py file. You can add your own logic there. Currently, nothing is done with the variables. You can use those Trigger Variables in AoE2 to drive scenario logic.
+The variables passed are trigger variables, but further trigger or xs modifications could be used to pass AI script variables, goals, etc. Currently, nothing is done with the variables. The goal of this repository is just to be a proof-of-concept showing that communication is possible and straightforward.
 
-For now, the variables passed are trigger variables, but further trigger or xs modifications could be used to pass AI script variables, goals, etc.
+In addition, in `add_xs_and_trigger_to_scenario.py` and in `my_comm.xs`, I have marked places where game logic code could be added. It is of course also possible to use those Trigger Variables in AoE2 to drive scenario logic, with the caveats mentioned below.
 
-The goal of this repository is just to be a proof of concept that this is possible and straightforward.
+Issues to watch out for:
 
+- Ensure the definitions (number of variables, locks) are the same in `config.py` and in the first lines of `my_comm.xs`.
 
-- Ensure the definitions/defines (number of variables, locks) are the same in config.py and in the first lines of my_comm.xs!
+- By default, this will use the first trigger variables (IDs 0 to config.NUM_VARS-1), so be careful if you are using those in other triggers. There is a position in the code to add potentially another lock, so the game engine can signal it's done using them, but for now it's not implemented for simplicity and to reduce delays.
+  - For now, it's best to use them in a read-only manner within the AoE2 engine, and modify them by modifying the XS script at the relevant places to collect information (the XS script can potentially be used to copy *other* Trigger Variables into the communicating variables before they are written, to pass information back from the engine).
 
-- By default, this will use the trigger variables 0 to NUM_VARS, so be careful if you are using those. There is a position in the code to add potentially another lock so the game can signal it's done using them, but for now it's not implemented
-
-- The existing triggers in your scenario will NOT be overwritten. The only compatibility risk, as mentioned above, is that this will reserve the use of the first NUM_VARS trigger variables.
+- The existing triggers in your scenario will NOT be overwritten. The only compatibility risk, as mentioned above, is that this will reserve the use of the first config.NUM_VARS trigger variables.
 
 
 ## Contact and Informations
 
-MIT License
+This work is made available under the MIT License.
 
 Original link: https://github.com/qferre/aoe2-xs-comm
 
-quentin.q.ferre@gmail.com
+For questions, please contact <quentin.q.ferre@gmail.com>
 
-
-Thanks to https://ksneijders.github.io/AoE2ScenarioParser/getting_started/ and https://ugc.aoe2.rocks/general/xs/programmer/
+Thanks to the [AoE2ScenarioParser](https://ksneijders.github.io/AoE2ScenarioParser/getting_started/) library, and the [UGC XS](https://ugc.aoe2.rocks/general/xs/programmer/) documentation, without which this project would not have been possible.

@@ -45,11 +45,13 @@ void main() {
         }
     }
 
-
+    // GAMEPLAY SCRIPTING
     // Optional: Here you can do something with the values, potentially modifying them.
     // Gameplay may also modify them.
-    
-    
+    // For example, you can set the trigger variables to the values of other trigger variables which are modified in game.
+    // This will ensure that communication is synchronized, since we will only re-write the file after the lines of code here are executed.
+
+
     // Close and reopen the file to write back the values
     closing_status = xsCloseFile();
     file_status = xsCreateFile(false); // "false" means we open in write mode and not append mode, so the file will be erased at each loop and we can write the values back
