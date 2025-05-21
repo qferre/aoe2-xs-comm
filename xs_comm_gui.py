@@ -125,7 +125,7 @@ def build_interface():
 
                 gr.Markdown("### Current XS Values")
                 gr.Textbox(
-                    value=get_current_values, label="name", interactive=False, every=1
+                    value=get_current_values, label="Debug values print", interactive=False, every=1
                 )
 
     return demo

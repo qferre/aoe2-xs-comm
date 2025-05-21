@@ -23,19 +23,25 @@ Create a scenario in the Scenario Editor according to your tastes and save it. A
 
 ### Launching
 
+#### Preparation
 - Change the parameters in `config.py`, notably your Windows account name, ID and the name of the scenario you created.
 - Run the `add_xs_and_trigger_to_scenario.py` file. This will modify the scenario with the specified name and create a new scenario with the same name but a "_MODIFIED" suffix.
+
+#### Live
 - Launch AoE II and launch the scenario with the "_MODIFIED" suffix (either testing in editor or in skirmish). This will create a xsdat file and wait for sync.
-- Now, launch the `xs_comm_gui.py` Python script, which will launch the Gradio GUI.
+- Now, launch the `xs_comm_gui.py` Python script in a terminal (and do not close it), which will launch the Gradio GUI.
 
 
 ### Usage
 
-- You can now connect to the GUI at 127.0.0.1:7860 (by default).
-- Set values for trigger variables and click **Send to XS**.
-- Live XS values are displayed and update every second.
+- You can now connect to the GUI at 127.0.0.1:7860 (by default). Live XS values are displayed and update every second in the GUI
+- Set values for trigger variables and click **Send to XS**. 
 
-TODO add two screenshots : of the gradio app, and of the xs chat log showing the same values
+![image](./img/gradio.png)
+
+- In game, the values will be printed every in-game second in the chat.
+
+![image](./img/log.png)
 
 ## Development
 
