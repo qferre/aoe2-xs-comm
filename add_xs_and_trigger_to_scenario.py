@@ -1,50 +1,42 @@
 import os
 from AoE2ScenarioParser.scenarios.aoe2_de_scenario import AoE2DEScenario
-from AoE2ScenarioParser.datasets.players import PlayerId
-from AoE2ScenarioParser.datasets.units import UnitInfo
 from pathlib import Path
+from config import GeneralConfig
+
 
 def add_xs_and_triggers_to_scenario(
-    scenario_path: str, xs_script_path: str, output_path: str,
+    scenario_path: str,
+    xs_script_path: str,
+    output_path: str,
+    xs_timer_loop: int = 1,
 ):
     """
-    Modifies an AoE2 scenario by adding an XS script and triggers that use XS variables.
+    Modifies an AoE2 scenario by adding an XS script which will regularly read
+    the XS variables into trigger variables and write them back.
 
     :param scenario_path: Path to the original .aoe2scenario file.
     :param xs_script_path: Path to the XS script file.
     :xs_func_name: Name of the XS function (in the XS script mentioned above) to call.
     :param output_path: Path to save the modified scenario.
     :param num_vars: Number of XS variables to handle.
+    :param xs_timer_loop: How often will the XS script fire, in AoE2 in-game seconds? (default is 1).
     """
     # Load the scenario
     scenario = AoE2DEScenario.from_file(scenario_path)
 
-
     # Add a trigger to call the XS 'main' function every second
     trigger_manager = scenario.trigger_manager
-    xs_trigger = trigger_manager.add_trigger("XS Main Loop",
-                                             looping =True,)
-    xs_trigger.new_condition.timer(timer=5) # TODO put this back to 1
+    xs_trigger = trigger_manager.add_trigger(
+        "XS Main Loop",
+        looping=True,
+    )
+    xs_trigger.new_condition.timer(timer=xs_timer_loop)
 
-
-    with open(xs_script_path, 'r', encoding='utf-8') as f:
+    with open(xs_script_path, "r", encoding="utf-8") as f:
         script_as_message = f.read()
-    xs_trigger.new_effect.script_call(message = script_as_message)
+    xs_trigger.new_effect.script_call(message=script_as_message)
 
-
-    ##### EXAMPLE TRIGGERS #####
-
-    # # Add triggers that use XS variables to perform actions
-    # for i in range(num_vars):
-    #     trigger = trigger_manager.add_trigger(f"Use XS Var {i}")
-    #     trigger.new_condition.timer(timer=2)  # Start after 2 seconds
-    #     trigger.new_condition.trigger_variable...# If variable i == 1
-    #     trigger.new_effect.create_object(
-    #         object_list_unit_id=UnitInfo.PALADIN.ID,
-    #         source_player=PlayerId.ONE,
-    #         location_x=10 + i * 2,
-    #         location_y=10,
-    #     )
+    # NOTE You can now add triggers that use XS variables to perform actions.
 
     # Save the modified scenario
 
@@ -59,14 +51,10 @@ def add_xs_and_triggers_to_scenario(
 if __name__ == "__main__":
 
     this_file_dir = os.path.dirname(os.path.abspath(__file__))
-
-    PATH_ROOT = Path(
-        "C:/Users/Quentin/Games/Age of Empires 2 DE/76561198007343704/resources/_common/scenario/"
-    )
+    config = GeneralConfig()
 
     add_xs_and_triggers_to_scenario(
-        scenario_path=f"{PATH_ROOT}/Testing.aoe2scenario",
+        scenario_path=config.scenario_path_input,
         xs_script_path=f"{this_file_dir}/my_comm.xs",
-        output_path=f"{PATH_ROOT}/Testing_MODIFIED.aoe2scenario",
+        output_path=config.scenario_path_output,
     )
-    # Example usage
